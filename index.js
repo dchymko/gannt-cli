@@ -7,7 +7,7 @@ import Papa from 'papaparse';
 import fs from 'fs/promises';
 import chalk from 'chalk';
 const inquirer = (await import('inquirer')).default;
-import { hexToRgb, loadProjectData, renderGanttChart } from './gantt.js';
+import { hexToRgb, loadProjectData, renderGanttChart } from './lib/gantt.js';
 
 
 

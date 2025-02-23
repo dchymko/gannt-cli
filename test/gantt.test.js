@@ -1,7 +1,7 @@
 // gantt.test.js
 
 import { jest } from '@jest/globals';
-import * as ganttModule from './gantt.js';
+import * as ganttModule from '../lib/gantt.js';
 import fs from 'fs/promises';
 import Papa from 'papaparse';
 
@@ -130,7 +130,7 @@ describe('Gantt Chart Rendering', () => {
     }
   ];
 
-  test.skip('renders chart with correct headers', () => {
+  test('renders chart with correct headers', () => {
     ganttModule.renderGanttChart(sampleTasks);
     expect(consoleSpy).toHaveBeenCalled();
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Task'));
