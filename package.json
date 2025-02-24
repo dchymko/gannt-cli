@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "./index.js",
+    "start": "./src/console.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "author": "",
@@ -13,6 +13,7 @@
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
     "inquirer": "^12.4.2",
+    "node-fetch": "^3.3.2",
     "papaparse": "^5.5.2"
   },
   "type": "module",
