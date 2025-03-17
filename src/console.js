@@ -7,7 +7,7 @@ import Papa from 'papaparse';
 import fs from 'fs/promises';
 import chalk from 'chalk';
 const inquirer = (await import('inquirer')).default;
-import { hexToRgb, loadProjectData, renderGanttChart } from './lib/gantt.js';
+import { hexToRgb, loadProjectDataAPI, renderGanttChart } from './lib/gantt.js';
 
 
 
@@ -18,7 +18,7 @@ const menuStructure = {
     submenus: {
         gantt: {
         name: 'Gantt Chart Tools',
-        actions: ['View Gantt Chart from CSV', 'Export Template CSV']
+        actions: ['View Gantt Chart', 'Export Template CSV']
         }
     }
     },
@@ -58,20 +58,12 @@ async function handleAction(mainMenu, submenu, action) {
   console.log(`Executing: ${mainMenu} > ${submenu} > ${action}`);
 
   if (mainMenu === 'Project Management' && submenu === 'Gantt Chart Tools') {
-    if (action === 'View Gantt Chart from CSV') {
-      const fileChoice = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'filepath',
-          message: 'Enter the path to your project CSV file:',
-          default: 'project.csv'
-        }
-      ]);
+    if (action === 'View Gantt Chart') {
 
       try {
-        const tasks = await loadProjectData(fileChoice.filepath);
+        const {people,tasks} = await loadProjectDataAPI();
         console.log('\nGenerating Gantt Chart...\n');
-        renderGanttChart(tasks);
+        renderGanttChart(tasks, people);
       } catch (error) {
         console.error('Error:', error.message);
       }

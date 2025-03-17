@@ -2,6 +2,7 @@
 import chalk from 'chalk';
 import Papa from 'papaparse';
 import fs from 'fs/promises';
+import { getPeople, getAllocations } from './float.js';
 
 // Utility function for converting hex colors to RGB
 export function hexToRgb(hex) {
@@ -23,7 +24,7 @@ export function getInitials(name) {
 }
 
 // Function to load and parse CSV data
-export async function loadProjectData(filepath) {
+export async function loadProjectDataCSV(filepath) {
   try {
     console.log('Reading file:', filepath); // Debug log
     const fileContent = await fs.readFile(filepath, 'utf8');
@@ -45,8 +46,21 @@ export async function loadProjectData(filepath) {
   }
 }
 
+// Function to load and parse CSV data
+export async function loadProjectDataAPI(filepath) {
+  try {
+    const people = await getPeople()
+    const tasks = await getAllocations();
+    return { people: people, tasks: tasks};
+  } catch (error) {
+    console.error('Error in loadProjectData:', error); // Debug log
+    throw new Error(`Error reading CSV file: ${error.message}`);
+  }
+}
+
+
 // Function to render the Gantt chart
-export function renderGanttChart(tasks) {
+export function renderGanttChart(tasks, people) {
   // Ensure dates are properly parsed
   const dates = tasks.map(task => ({
     start: new Date(task.start_date),
@@ -61,6 +75,7 @@ export function renderGanttChart(tasks) {
   const chartWidth = 50; // Adjustable chart width
   const daysPerChar = Math.ceil(totalDays / chartWidth);
 
+  /*
   // Debug information
   console.log('Date range:', {
     min: minDate.toISOString().split('T')[0],
@@ -68,6 +83,7 @@ export function renderGanttChart(tasks) {
     totalDays,
     daysPerChar
   });
+  */
 
   // Headers with month and date markers
   let monthHeader = chalk.bold('Task'.padEnd(20)) + chalk.bold('|');
@@ -126,7 +142,7 @@ export function renderGanttChart(tasks) {
 
   // Render each task
   tasks.forEach(task => {
-    let taskName = task.task.substring(0, 19).padEnd(20);
+    let taskName = task.name.substring(0, 19).padEnd(20);
     let line = chalk.white(taskName) + chalk.bold('|');
     const startPos = Math.floor((new Date(task.start_date) - minDate) / (1000 * 60 * 60 * 24 * daysPerChar));
     const duration = Math.ceil((new Date(task.end_date) - new Date(task.start_date)) / (1000 * 60 * 60 * 24 * daysPerChar));
@@ -148,7 +164,8 @@ export function renderGanttChart(tasks) {
     }
 
     // Calculate positions for the bar and initials
-    const initials = task.assignee ? getInitials(task.assignee) : '';
+    const assignee = people.find(p => p.people_id = task.people_id);
+    const initials = assignee ? getInitials(assignee.name) : '';
     const barLength = Math.max(1, duration);
 
     if (barLength > 2 && initials) {  // Only show initials if bar is long enough
